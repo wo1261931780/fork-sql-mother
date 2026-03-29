@@ -1,10 +1,133 @@
-# SQL 之母 - 闯关式 SQL 自学网
+# 📚 fork-sql-mother - SQL闯关式自学网站
 
-> 纯前端实现的闯关式 SQL 自学网
->
-> By [程序员鱼皮](https://docs.qq.com/doc/DUFFRVWladXVjeUxW) ，一人全役
+![Vue](https://img.shields.io/badge/Vue-3.x-brightgreen?logo=vue.js)
+![License](https://img.shields.io/badge/License-Unknown-lightgrey)
 
+## 📖 项目简介
 
+fork-sql-mother是纯前端实现的闯关式SQL自学网站,通过游戏化的方式帮助用户学习SQL语法,支持在线编辑和运行SQL语句。
+
+## 📦 项目来源
+
+- **原项目**: [liyupi/sql-mother](https://github.com/liyupi/sql-mother)
+- **原作者**: 程序员鱼皮 (liyupi)
+- **开源协议**: 未明确标注(需查看原项目)
+- **Fork时间**: 2024年
+
+## 🔧 二次开发内容
+
+本项目为原项目的学习研究版本,主要用于:
+- 学习Vue3前端开发技术
+- 研究游戏化教育产品的设计思路
+- 了解Monaco Editor和sql.js的应用
+
+## ⚠️ 许可证说明
+
+本项目原项目许可证未明确标注,仅供学习参考。
+
+## 系统架构 | System Architecture
+
+```mermaid
+graph TB
+    subgraph Frontend["🖥️ 前端应用"]
+        A[Vue 3] --> B[Ant Design Vue]
+        B --> C[页面组件]
+        C --> D[题目浏览区]
+        C --> E[SQL编码区]
+        C --> F[题目结果区]
+    end
+    
+    subgraph Core["⚙️ 核心引擎"]
+        G[Monaco Editor] --> H[代码编辑器]
+        I[sql.js] --> J[SQL执行引擎]
+        J --> K[WASM数据库]
+        K --> L[内存SQLite]
+    end
+    
+    subgraph Levels["📚 关卡系统"]
+        M[主线关卡] --> N[mainLevels.ts]
+        O[自定义关卡] --> P[customLevels.ts]
+        N --> Q[关卡加载器]
+        P --> Q
+        Q --> R[Markdown解析]
+        R --> S[bytemd]
+    end
+    
+    subgraph State["💾 状态管理"]
+        T[Pinia] --> U[全局Store]
+        U --> V[持久化插件]
+        V --> W[LocalStorage]
+    end
+    
+    style A fill:#e1f5ff
+    style I fill:#fff9c4
+    style K fill:#fff9c4
+    style M fill:#c8e6c9
+    style O fill:#c8e6c9
+```
+
+## 核心流程 | Core Workflow
+
+```mermaid
+sequenceDiagram
+    participant U as 用户
+    participant E as SQL编辑器
+    participant S as sql.js引擎
+    participant D as 内存数据库
+    participant J as 判题系统
+    participant R as 结果展示
+    
+    U->>E: 编写SQL语句
+    E->>S: 提交SQL代码
+    S->>D: 执行SQL语句
+    D->>S: 返回结果集
+    S->>J: 用户结果
+    
+    J->>D: 执行标准答案SQL
+    D->>J: 返回标准结果集
+    
+    J->>J: 对比列名
+    J->>J: 对比数据行
+    
+    alt 结果正确
+        J->>R: 显示成功提示
+        R->>U: 解锁下一关
+    else 结果错误
+        J->>R: 显示错误详情
+        R->>U: 提示修改
+    end
+```
+
+## 判题算法 | Judging Algorithm
+
+```mermaid
+flowchart TD
+    Start([用户提交SQL]) --> A[执行用户SQL]
+    A --> B[获取结果集1]
+    
+    Start --> C[执行答案SQL]
+    C --> D[获取结果集2]
+    
+    B --> E{列名对比}
+    D --> E
+    
+    E -->|不一致| F[❌ 列名错误]
+    E -->|一致| G{数据对比}
+    
+    G --> H[转换为JSON]
+    I --> H
+    I[结果集2]
+    
+    H --> J{JSON字符串匹配}
+    
+    J -->|匹配| K[✅ 答案正确]
+    J -->|不匹配| L[❌ 数据错误]
+    
+    style Start fill:#e1f5ff
+    style K fill:#c8e6c9
+    style F fill:#ffcdd2
+    style L fill:#ffcdd2
+```
 
 在线体验：http://sqlmother.yupi.icu
 
@@ -16,7 +139,83 @@
 
 一个完全免费的闯关式 SQL 自学教程网站，结合鱼皮自己的 SQL 学习实践经验，编写了 30 多个关卡，用户可以在线提交 SQL 代码做题闯关，目标是从 0 到 1 地带大家掌握常用的 SQL 语法。
 
-此外，网站支持自由选择关卡、自定义关卡、SQL 在线练习广场等功能。
+此外,网站支持自由选择关卡、自定义关卡、SQL 在线练习广场等功能。
+
+## 📊 系统架构
+
+```mermaid
+flowchart TB
+    subgraph Frontend["🖥️ 前端应用"]
+        UI["用户界面<br/>关卡选择"]
+        Editor["SQL编辑器<br/>代码编写"]
+        Result["结果展示<br/>执行反馈"]
+        Helper["题目助手<br/>提示系统"]
+    end
+    
+    subgraph Engine["⚙️ SQL引擎"]
+        SQLjs["SQL.js<br/>浏览器端SQL"]
+        Parser["SQL解析器"]
+        Validator["结果验证器"]
+    end
+    
+    subgraph Levels["🎮 关卡系统"]
+        Lessons["教程内容"]
+        Challenges["挑战关卡<br/>30+关卡"]
+        Custom["自定义关卡"]
+    end
+    
+    subgraph Storage["💾 本地存储"]
+        Progress["学习进度"]
+        Code["代码历史"]
+    end
+    
+    Frontend --> Engine
+    Engine --> Levels
+    Frontend --> Storage
+    
+    UI --> Editor
+    Editor --> SQLjs
+    SQLjs --> Parser
+    Parser --> Validator
+    Validator --> Result
+    
+    Lessons --> Challenges
+    Challenges --> Custom
+    
+    Editor --> Helper
+    
+    classDef frontStyle fill:#e3f2fd,stroke:#1565c0,stroke-width:2px
+    classDef engineStyle fill:#fff3e0,stroke:#f57c00,stroke-width:2px
+    classDef levelStyle fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px
+    classDef storageStyle fill:#e8f5e9,stroke:#388e3c,stroke-width:2px
+    
+    class UI,Editor,Result,Helper frontStyle
+    class SQLjs,Parser,Validator engineStyle
+    class Lessons,Challenges,Custom levelStyle
+    class Progress,Code storageStyle
+```
+
+## 🎮 学习流程
+
+```mermaid
+sequenceDiagram
+    participant User as 用户
+    participant UI as 界面
+    participant Editor as 编辑器
+    participant SQLjs as SQL引擎
+    participant Validator as 验证器
+    
+    User->>UI: 选择关卡
+    UI->>Editor: 加载题目
+    User->>Editor: 编写SQL
+    Editor->>SQLjs: 提交代码
+    SQLjs->>SQLjs: 执行SQL
+    SQLjs->>Validator: 返回结果
+    Validator->>Validator: 验证结果
+    Validator->>UI: 显示反馈
+    UI->>User: 提示通过/重试
+```
+
 
 ![](./doc/index.png)
 
